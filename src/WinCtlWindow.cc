@@ -59,6 +59,28 @@ NAN_METHOD(Window::GetActiveWindow) {
 	info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
 }
 
+NAN_METHOD(Window::GetFullscreenWindow) {
+	v8::Local<v8::Function> cons = Nan::New(constructor);
+	const int argc = 1;
+	HWND dskWin = GetDesktopWindow();
+	HWND fgWin = GetForegroundWindow();
+
+	RECT appBounds;
+	RECT rc;
+
+	if ( fgWin != dskWin && fgWin != GetShellWindow() ) {
+		GetWindowRect(dskWin, &rc);
+		GetWindowRect(fgWin, &appBounds);
+
+		if ( rc.left == appBounds.left && rc.top == appBounds.top && rc.right == appBounds.right && rc.bottom == appBounds.bottom ) {
+			dskWin = NULL;
+		}
+	}
+	
+	v8::Local<v8::Value> argv[1] = {Nan::New((int)dskWin)};
+	info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
+}
+
 NAN_METHOD(Window::GetWindowByClassName) {
 	v8::Local<v8::Function> cons = Nan::New(constructor);
 
